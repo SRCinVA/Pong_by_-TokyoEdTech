@@ -1,10 +1,15 @@
 import turtle
+import os
 
 wn = turtle.Screen() #creates a window
 wn.title("Pong by @TokyoEdTech")
 wn.bgcolor("black")
 wn.setup(width=800, height=600)
 wn.tracer(0) #stops the window from updating
+
+#Score
+score_a = 0
+score_b = 0 
 
 #Paddle A
 paddle_a = turtle.Turtle() #Capital letter for the class name
@@ -34,6 +39,15 @@ ball.goto(0, 0)  # 0 in the middle, then -350 and +350 on both sides.
 ball.dx = 2 #delta x method
 ball.dy = -2 #delta y method
 
+# Pen
+pen = turtle.Turtle() #lower case for module; caps for the object.
+pen.speed(0)
+pen.color("white")
+pen.penup()
+pen.hideturtle()
+pen.goto(0,260)
+pen.write("Player A: 0   Player B: 0", align="center", font=("Courier", 24, "normal"))
+
 #Functions
 def paddle_a_up():
     y = paddle_a.ycor() #.ycor method from turtle
@@ -59,13 +73,13 @@ def paddle_b_down():
 
 #Keyboard binding
 wn.listen() #sets up listener
-wn.onkeypress(paddle_a_up, "w") #when user presses lower case w, call def paddle_a_up
+wn.onkey(paddle_a_up, "w") #when user presses lower case w, call def paddle_a_up
 # when user presses lower case w, call def paddle_a_up
-wn.onkeypress(paddle_a_down, "s")
+wn.onkey(paddle_a_down, "s")
 
-wn.onkeypress(paddle_b_up, "Up")
+wn.onkey(paddle_b_up, "Up")
 
-wn.onkeypress(paddle_b_down, "Down")
+wn.onkey(paddle_b_down, "Down")
 
 #Main game loop
 while True:
@@ -80,6 +94,7 @@ while True:
     if ball.ycor() > 290:
         ball.sety(290)
         ball.dy *= -1 #reverses direction
+        os.system("afplay boink.wav&")
 
     if ball.ycor() < -290:
         ball.sety(-290)
@@ -87,4 +102,24 @@ while True:
 
     if ball.xcor() > 390:
         ball.goto(0,0) #after falling off screen, reappears at 0,0.
+        ball.dx *= -1
+        score_a += 1
+        pen.clear()
+        pen.write("Player A: {}   Player B: {}".format(score_a, score_b), align="center",font=("Courier", 24, "normal"))
+
+    if ball.xcor() < -390:
+        ball.goto(0, 0)  # after falling off screen, reappears at 0,0.
+        ball.dx *= -1
+        score_b += 1
+        pen.clear()
+        pen.write("Player A: {}   Player B: {}".format(score_a, score_b), align="center", font=("Courier", 24, "normal"))
+
+
+    # Paddle and ball collisions
+    if ball.xcor() > 340 and ball.xcor() < 350 and (ball.ycor() < paddle_b.ycor() + 40 and ball.ycor() > paddle_b.ycor() - 40):
+        ball.setx(340)
+        ball.dx *= -1
+
+    if ball.xcor() < -340 and ball.xcor() > -350 and (ball.ycor() < paddle_a.ycor() + 40 and ball.ycor() > paddle_a.ycor() - 40):
+        ball.setx(-340)
         ball.dx *= -1
